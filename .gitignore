@@ -129,3 +129,6 @@ pip-log.txt
 .mr.developer.cfg
 # Mac crap
 .DS_Store
+
+#ignore newtonsoft
+packages/Newtonsoft.Json.6.0.4
