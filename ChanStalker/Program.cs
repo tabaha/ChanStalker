@@ -10,7 +10,7 @@ namespace ChanStalker
 {
     class Program
     {
-        static String configFile = "config.ini";
+        
 
         static String GetJsonFromUrl(String url)
         {
@@ -30,9 +30,6 @@ namespace ChanStalker
 
         static void Main(string[] args)
         {
-            List<String> hue = LoadSettings();
-            if (hue == null) return;
-
             String basefilename = ((long)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds).ToString();
             Console.WriteLine("filename: " + basefilename);
 
@@ -42,46 +39,28 @@ namespace ChanStalker
             List<Page> pages = JsonConvert.DeserializeObject<List<Page>>(result);
 
 
-            System.Threading.Thread.Sleep(2000);
+            System.Threading.Thread.Sleep(1500);
 
-            ThreadAnalyzer ta = new ThreadAnalyzer(hue, basefilename);
+            ThreadAnalyzer ta = new ThreadAnalyzer(basefilename);
+            /*foreach (Page page in pages)
+            {*/
+                foreach (Thread t in pages[0].threads /*page.threads*/)
+                {
+                    String res = GetJsonFromUrl(@"http://a.4cdn.org/a/thread/" + t.no + ".json");
 
-            foreach (Thread t in pages[0].threads)
-            {
-                String res = GetJsonFromUrl(@"http://a.4cdn.org/a/thread/" + t.no + ".json");
+                    Thread newT = JsonConvert.DeserializeObject<Thread>(res);
+                    newT.no = t.no;
 
-                Thread newT = JsonConvert.DeserializeObject<Thread>(res);
-                newT.no = t.no;
+                    (new System.Threading.Thread(ta.ThreadedAnalyze)).Start(newT);
 
-                (new System.Threading.Thread(ta.ThreadedAnalyze)).Start(newT);
+                    System.Threading.Thread.Sleep(1500);
 
-                System.Threading.Thread.Sleep(2000);
-
-            }
-
+                }
+            /*}*/
+            Console.WriteLine("Done. Press Enter to close");
             Console.ReadLine();
         }
 
-        static List<String> LoadSettings()
-        {
-            if (File.Exists(configFile))
-            {
-                List<String> result = new List<string>();
-
-                using (StreamReader reader = new StreamReader(configFile))
-                {
-                    String input;
-                    while ((input = reader.ReadLine()) != null)
-                    {
-                        result.Add(input);
-                    }
-                }
-                return result;
-            }
-            else
-            {
-                return null;
-            }
-        }
+       
     }
 }

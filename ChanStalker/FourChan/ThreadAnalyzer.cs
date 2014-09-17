@@ -4,18 +4,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using ChanStalker.Parsers;
 
 namespace ChanStalker.FourChan
 {
     class ThreadAnalyzer
     {
-        private List<String> Rules;
         private String ResultFile;
+        private List<IParser> Parsers;
 
-        public ThreadAnalyzer(List<String> rules, String resultFile)
+        public ThreadAnalyzer(String resultFile)
         {
-            Rules = rules;
             ResultFile = resultFile;
+            Parsers = new List<IParser>();
+            LoadParsers();
+        }
+
+        private void LoadParsers() {
+            Parsers.Add(new BasicText());
+            //Parsers.Add(new ExHentai());
         }
 
         public void ThreadedAnalyze(Object o)
@@ -32,7 +39,7 @@ namespace ChanStalker.FourChan
             foreach (Post p in thread.posts)
             {
                 List<String> results;
-                if ((results = ContainsIt(p.name, p.trip, p.filename, p.com)).Count != 0)
+                if ((results = ContainsIt(p)).Count != 0)
                 {
                     count++;
                     Console.Write(@"-> http://boards.4chan.org/a/thread/" + thread.no + "#p" + p.no);
@@ -48,29 +55,15 @@ namespace ChanStalker.FourChan
         }
 
 
-        private List<String> ContainsIt(String name, String trip, String filename, String comment)
+        private List<String> ContainsIt(Post post)
         {
-            List<String> result = new List<string>();
-            foreach (String s in Rules)
-            {
-                if (filename != null && filename.ToLower().Contains(s))
-                {
-                    result.Add(s);
-                }
-                else if (comment != null && comment.ToLower().Contains(s))
-                {
-                    result.Add(s);
-                }
-                else if (name != null && name.ToLower().Contains(s))
-                {
-                    result.Add(s);
-                }
-                else if (trip != null && trip.ToLower().Contains(s))
-                {
-                    result.Add(s);
-                }
+            List<String> results = new List<string>();
+
+            foreach (IParser parser in Parsers) {
+                results.AddRange(parser.Parse(post));
             }
-            return result;
+
+            return results;
         }
 
         private void WritePlainTextResults(String address, List<String> words)

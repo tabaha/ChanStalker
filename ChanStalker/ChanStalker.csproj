@@ -65,6 +65,9 @@
     <Compile Include="FourChan\Post.cs" />
     <Compile Include="FourChan\Thread.cs" />
     <Compile Include="FourChan\ThreadAnalyzer.cs" />
+    <Compile Include="Parsers\BasicText.cs" />
+    <Compile Include="Parsers\ExHentai.cs" />
+    <Compile Include="Parsers\IParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
