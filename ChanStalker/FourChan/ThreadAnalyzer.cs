@@ -21,8 +21,8 @@ namespace ChanStalker.FourChan
         }
 
         private void LoadParsers() {
-            Parsers.Add(new BasicText());
-            //Parsers.Add(new ExHentai());
+            //Parsers.Add(new BasicText());
+            Parsers.Add(new ExHentai());
         }
 
         public void ThreadedAnalyze(Object o)
@@ -38,6 +38,7 @@ namespace ChanStalker.FourChan
             Console.WriteLine("Thread: " + thread.no);
             foreach (Post p in thread.posts)
             {
+                if(p.com!=null) p.com = p.com.Replace("<wbr>", "").Replace("</wbr>", "");
                 List<String> results;
                 if ((results = ContainsIt(p)).Count != 0)
                 {

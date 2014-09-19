@@ -17,8 +17,10 @@ namespace ChanStalker.Parsers {
 
         public List<String> Parse(Post post) {
             List<String> results = new List<string>();
+            if (post.com == null) return results;
             MatchCollection matches = ExHentaiMatcher.Matches(post.com);
             foreach (Match match in matches) {
+                Console.WriteLine(match.Value);
                 results.Add(match.Value);
             }
             return results;
